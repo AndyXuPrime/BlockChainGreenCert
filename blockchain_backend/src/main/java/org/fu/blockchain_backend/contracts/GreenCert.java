@@ -1,0 +1,316 @@
+package org.fu.blockchain_backend.contracts;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.fisco.bcos.sdk.v3.client.Client;
+import org.fisco.bcos.sdk.v3.codec.datatypes.Address;
+import org.fisco.bcos.sdk.v3.codec.datatypes.Bool;
+import org.fisco.bcos.sdk.v3.codec.datatypes.Event;
+import org.fisco.bcos.sdk.v3.codec.datatypes.Function;
+import org.fisco.bcos.sdk.v3.codec.datatypes.Type;
+import org.fisco.bcos.sdk.v3.codec.datatypes.TypeReference;
+import org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String;
+import org.fisco.bcos.sdk.v3.codec.datatypes.generated.Uint256;
+import org.fisco.bcos.sdk.v3.codec.datatypes.generated.tuples.generated.Tuple1;
+import org.fisco.bcos.sdk.v3.codec.datatypes.generated.tuples.generated.Tuple2;
+import org.fisco.bcos.sdk.v3.codec.datatypes.generated.tuples.generated.Tuple4;
+import org.fisco.bcos.sdk.v3.codec.datatypes.generated.tuples.generated.Tuple7;
+import org.fisco.bcos.sdk.v3.contract.Contract;
+import org.fisco.bcos.sdk.v3.crypto.CryptoSuite;
+import org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.v3.model.CryptoType;
+import org.fisco.bcos.sdk.v3.model.TransactionReceipt;
+import org.fisco.bcos.sdk.v3.model.callback.CallCallback;
+import org.fisco.bcos.sdk.v3.model.callback.TransactionCallback;
+import org.fisco.bcos.sdk.v3.transaction.model.exception.ContractException;
+
+@SuppressWarnings("unchecked")
+public class GreenCert extends Contract {
+    public static final String[] BINARY_ARRAY = {"608060405234801561001057600080fd5b5033600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506117e9806100616000396000f30060806040526004361061006d576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff168063089255371461007257806349bc55e81461014b5780637b20351b146101d4578063a239e33d146103a1578063e0eb38d6146103f8575b600080fd5b34801561007e57600080fd5b50610149600480360381019080803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509192919290803573ffffffffffffffffffffffffffffffffffffffff169060200190929190803590602001908201803590602001908080601f016020809104026020016040519081016040528093929190818152602001838380828437820191505050505050919291929080359060200190929190505050610461565b005b34801561015757600080fd5b506101d2600480360381019080803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509192919290803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610912565b005b3480156101e057600080fd5b5061023b600480360381019080803590602001908201803590602001908080601f0160208091040260200160405190810160405280939291908181526020018383808284378201915050505050509192919290505050610e91565b60405180806020018873ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018773ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001806020018681526020018581526020018415151515815260200183810383528a818151815260200191508051906020019080838360005b838110156102f95780820151818401526020810190506102de565b50505050905090810190601f1680156103265780820380516001836020036101000a031916815260200191505b50838103825287818151815260200191508051906020019080838360005b8381101561035f578082015181840152602081019050610344565b50505050905090810190601f16801561038c5780820380516001836020036101000a031916815260200191505b50995050505050505050505060405180910390f35b3480156103ad57600080fd5b506103b661128c565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561040457600080fd5b5061045f600480360381019080803590602001908201803590602001908080601f01602080910402602001604051908101604052809392919081815260200183838082843782019150505050505091929192905050506112b2565b005b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561054c576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001807f4f6e6c792041646d696e2063616e20697373756520636572746966696361746581526020017f732100000000000000000000000000000000000000000000000000000000000081525060400191505060405180910390fd5b6000846040518082805190602001908083835b602083101515610584578051825260208201915060208101905060208303925061055f565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060060160009054906101000a900460ff1615151561063d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601e8152602001807f436572746966696361746520494420616c72656164792065786973747321000081525060200191505060405180910390fd5b610100604051908101604052808581526020013373ffffffffffffffffffffffffffffffffffffffff1681526020018473ffffffffffffffffffffffffffffffffffffffff168152602001838152602001828152602001428152602001600115158152602001600115158152506000856040518082805190602001908083835b6020831015156106e257805182526020820191506020810190506020830392506106bd565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060008201518160000190805190602001906107319291906116a2565b5060208201518160010160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060408201518160020160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060608201518160030190805190602001906107dc9291906116a2565b506080820151816004015560a0820151816005015560c08201518160060160006101000a81548160ff02191690831515021790555060e08201518160060160016101000a81548160ff0219169083151502179055509050507fb4e465462c051b0fcdc2c23a1a5a8f9082a6bf33b94d2f078b3471f3e0f644fd84848360405180806020018473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001838152602001828103825285818151815260200191508051906020019080838360005b838110156108d05780820151818401526020810190506108b5565b50505050905090810190601f1680156108fd5780820380516001836020036101000a031916815260200191505b5094505050505060405180910390a150505050565b600080836040518082805190602001908083835b60208310151561094b5780518252602082019150602081019050602083039250610926565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060060160009054906101000a900460ff161515610a03576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601b8152602001807f436572746966696361746520646f6573206e6f7420657869737421000000000081525060200191505060405180910390fd5b6000836040518082805190602001908083835b602083101515610a3b5780518252602082019150602081019050602083039250610a16565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060060160019054906101000a900460ff161515610b19576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260228152602001807f5468697320636572746966696361746520686173206265656e205245564f4b4581526020017f442100000000000000000000000000000000000000000000000000000000000081525060400191505060405180910390fd5b3373ffffffffffffffffffffffffffffffffffffffff166000846040518082805190602001908083835b602083101515610b685780518252602082019150602081019050602083039250610b43565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060020160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16141515610c4a576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260168152602001807f596f7520617265206e6f7420746865206f776e6572210000000000000000000081525060200191505060405180910390fd5b6000836040518082805190602001908083835b602083101515610c825780518252602082019150602081019050602083039250610c5d565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060020160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff169050816000846040518082805190602001908083835b602083101515610d145780518252602082019150602081019050602083039250610cef565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060020160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055507f5be0ede2d0c0c85ec164ca7244e5ae32f366bd6a32523287a378581ca2e957d583828460405180806020018473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020018373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001828103825285818151815260200191508051906020019080838360005b83811015610e50578082015181840152602081019050610e35565b50505050905090810190601f168015610e7d5780820380516001836020036101000a031916815260200191505b5094505050505060405180910390a1505050565b606060008060606000806000610ea5611722565b6000896040518082805190602001908083835b602083101515610edd5780518252602082019150602081019050602083039250610eb8565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060060160009054906101000a900460ff161515610f95576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601b8152602001807f436572746966696361746520646f6573206e6f7420657869737421000000000081525060200191505060405180910390fd5b600089604051808280","5190602001908083835b602083101515610fcd5780518252602082019150602081019050602083039250610fa8565b6001836020036101000a03801982511681845116808217855250505050505090500191505090815260200160405180910390206101006040519081016040529081600082018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156110a65780601f1061107b576101008083540402835291602001916110a6565b820191906000526020600020905b81548152906001019060200180831161108957829003601f168201915b505050505081526020016001820160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1681526020016002820160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001600382018054600181600116156101000203166002900480601f0160208091040260200160405190810160405280929190818152602001828054600181600116156101000203166002900480156111f45780601f106111c9576101008083540402835291602001916111f4565b820191906000526020600020905b8154815290600101906020018083116111d757829003601f168201915b5050505050815260200160048201548152602001600582015481526020016006820160009054906101000a900460ff161515151581526020016006820160019054906101000a900460ff1615151515815250509050806000015181602001518260400151836060015184608001518560a001518660e00151869650839350975097509750975097509750975050919395979092949650565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561139d576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260238152602001807f4f6e6c792041646d696e2063616e207265766f6b65206365727469666963617481526020017f657321000000000000000000000000000000000000000000000000000000000081525060400191505060405180910390fd5b6000816040518082805190602001908083835b6020831015156113d557805182526020820191506020810190506020830392506113b0565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060060160009054906101000a900460ff16151561148d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601b8152602001807f436572746966696361746520646f6573206e6f7420657869737421000000000081525060200191505060405180910390fd5b6000816040518082805190602001908083835b6020831015156114c557805182526020820191506020810190506020830392506114a0565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060060160019054906101000a900460ff16151561157d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601f8152602001807f436572746966696361746520697320616c7265616479207265766f6b6564210081525060200191505060405180910390fd5b600080826040518082805190602001908083835b6020831015156115b65780518252602082019150602081019050602083039250611591565b6001836020036101000a038019825116818451168082178552505050505050905001915050908152602001604051809103902060060160016101000a81548160ff0219169083151502179055507f38c0f30665d1e12b1a8837c581d16060b3049ed2186b947219cea01624e8cfdb816040518080602001828103825283818151815260200191508051906020019080838360005b8381101561166557808201518184015260208101905061164a565b50505050905090810190601f1680156116925780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106116e357805160ff1916838001178555611711565b82800160010185558215611711579182015b828111156117105782518255916020019190600101906116f5565b5b50905061171e9190611798565b5090565b6101006040519081016040528060608152602001600073ffffffffffffffffffffffffffffffffffffffff168152602001600073ffffffffffffffffffffffffffffffffffffffff1681526020016060815260200160008152602001600081526020016000151581526020016000151581525090565b6117ba91905b808211156117b657600081600090555060010161179e565b5090565b905600a165627a7a723058204acdc4cdeb29f63442cbe8f1d30ee2caf92029804e68585ee601f972208ddb190029"};
+
+    public static final String BINARY = org.fisco.bcos.sdk.v3.utils.StringUtils.joinAll("", BINARY_ARRAY);
+
+    public static final String[] SM_BINARY_ARRAY = {};
+
+    public static final String SM_BINARY = org.fisco.bcos.sdk.v3.utils.StringUtils.joinAll("", SM_BINARY_ARRAY);
+
+    public static final String[] ABI_ARRAY = {"[{\"constant\":false,\"inputs\":[{\"name\":\"_certId\",\"type\":\"string\"},{\"name\":\"_owner\",\"type\":\"address\"},{\"name\":\"_energyType\",\"type\":\"string\"},{\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"issueCert\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_certId\",\"type\":\"string\"},{\"name\":\"_newOwner\",\"type\":\"address\"}],\"name\":\"transferCert\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_certId\",\"type\":\"string\"}],\"name\":\"getCert\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"},{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"address\"},{\"name\":\"\",\"type\":\"string\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"uint256\"},{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"systemAdmin\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_certId\",\"type\":\"string\"}],\"name\":\"revokeCert\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"certId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Issue\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"certId\",\"type\":\"string\"},{\"indexed\":false,\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"to\",\"type\":\"address\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"certId\",\"type\":\"string\"}],\"name\":\"Revoke\",\"type\":\"event\"}]"};
+
+    public static final String ABI = org.fisco.bcos.sdk.v3.utils.StringUtils.joinAll("", ABI_ARRAY);
+
+    public static final String FUNC_ISSUECERT = "issueCert";
+
+    public static final String FUNC_TRANSFERCERT = "transferCert";
+
+    public static final String FUNC_GETCERT = "getCert";
+
+    public static final String FUNC_SYSTEMADMIN = "systemAdmin";
+
+    public static final String FUNC_REVOKECERT = "revokeCert";
+
+    public static final Event ISSUE_EVENT = new Event("Issue", 
+            Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Uint256>() {}));
+    ;
+
+    public static final Event TRANSFER_EVENT = new Event("Transfer", 
+            Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Address>() {}));
+    ;
+
+    public static final Event REVOKE_EVENT = new Event("Revoke", 
+            Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}));
+    ;
+
+    protected GreenCert(String contractAddress, Client client, CryptoKeyPair credential) {
+        super(getBinary(client.getCryptoSuite()), contractAddress, client, credential);
+    }
+
+    public static String getBinary(CryptoSuite cryptoSuite) {
+        return (cryptoSuite.getCryptoTypeConfig() == CryptoType.ECDSA_TYPE ? BINARY : SM_BINARY);
+    }
+
+    public static String getABI() {
+        return ABI;
+    }
+
+    public TransactionReceipt issueCert(String _certId, String _owner, String _energyType,
+            BigInteger _amount) {
+        final Function function = new Function(
+                FUNC_ISSUECERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Address(_owner), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_energyType), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.generated.Uint256(_amount)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return executeTransaction(function);
+    }
+
+    public String getSignedTransactionForIssueCert(String _certId, String _owner,
+            String _energyType, BigInteger _amount) {
+        final Function function = new Function(
+                FUNC_ISSUECERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Address(_owner), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_energyType), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.generated.Uint256(_amount)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return createSignedTransaction(function);
+    }
+
+    public String issueCert(String _certId, String _owner, String _energyType, BigInteger _amount,
+            TransactionCallback callback) {
+        final Function function = new Function(
+                FUNC_ISSUECERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Address(_owner), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_energyType), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.generated.Uint256(_amount)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return asyncExecuteTransaction(function, callback);
+    }
+
+    public Tuple4<String, String, String, BigInteger> getIssueCertInput(
+            TransactionReceipt transactionReceipt) {
+        String data = transactionReceipt.getInput().substring(10);
+        final Function function = new Function(FUNC_ISSUECERT, 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Uint256>() {}));
+        List<Type> results = this.functionReturnDecoder.decode(data, function.getOutputParameters());
+        return new Tuple4<String, String, String, BigInteger>(
+
+                (String) results.get(0).getValue(), 
+                (String) results.get(1).getValue(), 
+                (String) results.get(2).getValue(), 
+                (BigInteger) results.get(3).getValue()
+                );
+    }
+
+    public TransactionReceipt transferCert(String _certId, String _newOwner) {
+        final Function function = new Function(
+                FUNC_TRANSFERCERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Address(_newOwner)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return executeTransaction(function);
+    }
+
+    public String getSignedTransactionForTransferCert(String _certId, String _newOwner) {
+        final Function function = new Function(
+                FUNC_TRANSFERCERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Address(_newOwner)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return createSignedTransaction(function);
+    }
+
+    public String transferCert(String _certId, String _newOwner, TransactionCallback callback) {
+        final Function function = new Function(
+                FUNC_TRANSFERCERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId), 
+                new org.fisco.bcos.sdk.v3.codec.datatypes.Address(_newOwner)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return asyncExecuteTransaction(function, callback);
+    }
+
+    public Tuple2<String, String> getTransferCertInput(TransactionReceipt transactionReceipt) {
+        String data = transactionReceipt.getInput().substring(10);
+        final Function function = new Function(FUNC_TRANSFERCERT, 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}));
+        List<Type> results = this.functionReturnDecoder.decode(data, function.getOutputParameters());
+        return new Tuple2<String, String>(
+
+                (String) results.get(0).getValue(), 
+                (String) results.get(1).getValue()
+                );
+    }
+
+    public Tuple7<String, String, String, String, BigInteger, BigInteger, Boolean> getCert(
+            String _certId) throws ContractException {
+        final Function function = new Function(FUNC_GETCERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId)), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Uint256>() {}, new TypeReference<Uint256>() {}, new TypeReference<Bool>() {}));
+        List<Type> results = executeCallWithMultipleValueReturn(function);
+        return new Tuple7<String, String, String, String, BigInteger, BigInteger, Boolean>(
+                (String) results.get(0).getValue(), 
+                (String) results.get(1).getValue(), 
+                (String) results.get(2).getValue(), 
+                (String) results.get(3).getValue(), 
+                (BigInteger) results.get(4).getValue(), 
+                (BigInteger) results.get(5).getValue(), 
+                (Boolean) results.get(6).getValue());
+    }
+
+    public void getCert(String _certId, CallCallback callback) throws ContractException {
+        final Function function = new Function(FUNC_GETCERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId)), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}, new TypeReference<Address>() {}, new TypeReference<Address>() {}, new TypeReference<Utf8String>() {}, new TypeReference<Uint256>() {}, new TypeReference<Uint256>() {}, new TypeReference<Bool>() {}));
+        asyncExecuteCall(function, callback);
+    }
+
+    public String systemAdmin() throws ContractException {
+        final Function function = new Function(FUNC_SYSTEMADMIN, 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}));
+        return executeCallWithSingleValueReturn(function, String.class);
+    }
+
+    public void systemAdmin(CallCallback callback) throws ContractException {
+        final Function function = new Function(FUNC_SYSTEMADMIN, 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Address>() {}));
+        asyncExecuteCall(function, callback);
+    }
+
+    public TransactionReceipt revokeCert(String _certId) {
+        final Function function = new Function(
+                FUNC_REVOKECERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return executeTransaction(function);
+    }
+
+    public String getSignedTransactionForRevokeCert(String _certId) {
+        final Function function = new Function(
+                FUNC_REVOKECERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return createSignedTransaction(function);
+    }
+
+    public String revokeCert(String _certId, TransactionCallback callback) {
+        final Function function = new Function(
+                FUNC_REVOKECERT, 
+                Arrays.<Type>asList(new org.fisco.bcos.sdk.v3.codec.datatypes.Utf8String(_certId)), 
+                Collections.<TypeReference<?>>emptyList(), 0);
+        return asyncExecuteTransaction(function, callback);
+    }
+
+    public Tuple1<String> getRevokeCertInput(TransactionReceipt transactionReceipt) {
+        String data = transactionReceipt.getInput().substring(10);
+        final Function function = new Function(FUNC_REVOKECERT, 
+                Arrays.<Type>asList(), 
+                Arrays.<TypeReference<?>>asList(new TypeReference<Utf8String>() {}));
+        List<Type> results = this.functionReturnDecoder.decode(data, function.getOutputParameters());
+        return new Tuple1<String>(
+
+                (String) results.get(0).getValue()
+                );
+    }
+
+    public List<IssueEventResponse> getIssueEvents(TransactionReceipt transactionReceipt) {
+        List<Contract.EventValuesWithLog> valueList = extractEventParametersWithLog(ISSUE_EVENT, transactionReceipt);
+        ArrayList<IssueEventResponse> responses = new ArrayList<IssueEventResponse>(valueList.size());
+        for (Contract.EventValuesWithLog eventValues : valueList) {
+            IssueEventResponse typedResponse = new IssueEventResponse();
+            typedResponse.log = eventValues.getLog();
+            typedResponse.certId = (String) eventValues.getNonIndexedValues().get(0).getValue();
+            typedResponse.owner = (String) eventValues.getNonIndexedValues().get(1).getValue();
+            typedResponse.amount = (BigInteger) eventValues.getNonIndexedValues().get(2).getValue();
+            responses.add(typedResponse);
+        }
+        return responses;
+    }
+
+    public List<TransferEventResponse> getTransferEvents(TransactionReceipt transactionReceipt) {
+        List<Contract.EventValuesWithLog> valueList = extractEventParametersWithLog(TRANSFER_EVENT, transactionReceipt);
+        ArrayList<TransferEventResponse> responses = new ArrayList<TransferEventResponse>(valueList.size());
+        for (Contract.EventValuesWithLog eventValues : valueList) {
+            TransferEventResponse typedResponse = new TransferEventResponse();
+            typedResponse.log = eventValues.getLog();
+            typedResponse.certId = (String) eventValues.getNonIndexedValues().get(0).getValue();
+            typedResponse.from = (String) eventValues.getNonIndexedValues().get(1).getValue();
+            typedResponse.to = (String) eventValues.getNonIndexedValues().get(2).getValue();
+            responses.add(typedResponse);
+        }
+        return responses;
+    }
+
+    public List<RevokeEventResponse> getRevokeEvents(TransactionReceipt transactionReceipt) {
+        List<Contract.EventValuesWithLog> valueList = extractEventParametersWithLog(REVOKE_EVENT, transactionReceipt);
+        ArrayList<RevokeEventResponse> responses = new ArrayList<RevokeEventResponse>(valueList.size());
+        for (Contract.EventValuesWithLog eventValues : valueList) {
+            RevokeEventResponse typedResponse = new RevokeEventResponse();
+            typedResponse.log = eventValues.getLog();
+            typedResponse.certId = (String) eventValues.getNonIndexedValues().get(0).getValue();
+            responses.add(typedResponse);
+        }
+        return responses;
+    }
+
+    public static GreenCert load(String contractAddress, Client client, CryptoKeyPair credential) {
+        return new GreenCert(contractAddress, client, credential);
+    }
+
+    public static GreenCert deploy(Client client, CryptoKeyPair credential) throws
+            ContractException {
+        return deploy(GreenCert.class, client, credential, getBinary(client.getCryptoSuite()), getABI(), null, null);
+    }
+
+    public static class IssueEventResponse {
+        public TransactionReceipt.Logs log;
+
+        public String certId;
+
+        public String owner;
+
+        public BigInteger amount;
+    }
+
+    public static class TransferEventResponse {
+        public TransactionReceipt.Logs log;
+
+        public String certId;
+
+        public String from;
+
+        public String to;
+    }
+
+    public static class RevokeEventResponse {
+        public TransactionReceipt.Logs log;
+
+        public String certId;
+    }
+}
