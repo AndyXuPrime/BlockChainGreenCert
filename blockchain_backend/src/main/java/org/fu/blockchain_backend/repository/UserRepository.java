@@ -1,6 +1,6 @@
 package org.fu.blockchain_backend.repository;
 
-import org.fu.blockchain_backend.model.User;
+import org.fu.blockchain_backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

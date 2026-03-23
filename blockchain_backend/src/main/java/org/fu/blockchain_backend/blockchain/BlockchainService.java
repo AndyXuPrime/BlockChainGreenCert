@@ -6,7 +6,7 @@ import org.fisco.bcos.sdk.v3.crypto.CryptoSuite;
 import org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair;
 import org.fisco.bcos.sdk.v3.model.TransactionReceipt;
 import org.fu.blockchain_backend.contracts.DegreeStorage;
-import org.fu.blockchain_backend.model.Degree;
+import org.fu.blockchain_backend.entity.Degree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,8 +59,6 @@ public class BlockchainService {
 
     public String uploadDegreeToBlockchain(Degree degree, String timestamp) {
         init();
-        //long currentMillis = System.currentTimeMillis();
-        //String timestamp = String.valueOf(currentMillis);
         try{
             TransactionReceipt receipt = degreeStorage.addDegree(
                     degree.getName(), degree.getIdCardNum(), degree.getUniversity(), degree.getMajor(), degree.getDegreeLevel(),  degree.getGraduationDate().toString(), timestamp
