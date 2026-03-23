@@ -3,7 +3,6 @@ package org.fu.blockchain_backend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.fu.blockchain_backend.entity.SysUser;
 import org.fu.blockchain_backend.mapper.SysUserMapper;
-import org.fu.blockchain_backend.util.WeBASEUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

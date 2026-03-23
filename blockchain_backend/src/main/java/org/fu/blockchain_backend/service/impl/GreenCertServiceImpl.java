@@ -2,14 +2,12 @@ package org.fu.blockchain_backend.service.impl;
 
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
-import org.fu.blockchain_backend.config.WeBASEConfig;
 import org.fu.blockchain_backend.entity.CertTransferLog;
 import org.fu.blockchain_backend.entity.GreenCert;
 import org.fu.blockchain_backend.entity.SysUser;
 import org.fu.blockchain_backend.mapper.CertTransferLogMapper;
 import org.fu.blockchain_backend.mapper.GreenCertMapper;
 import org.fu.blockchain_backend.mapper.SysUserMapper;
-import org.fu.blockchain_backend.util.WeBASEUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
