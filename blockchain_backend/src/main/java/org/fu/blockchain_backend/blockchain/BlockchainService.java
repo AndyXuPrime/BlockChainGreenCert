@@ -1,0 +1,98 @@
+package org.fu.blockchain_backend.blockchain;
+
+import org.fisco.bcos.sdk.v3.BcosSDK;
+import org.fisco.bcos.sdk.v3.client.Client;
+import org.fisco.bcos.sdk.v3.crypto.CryptoSuite;
+import org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair;
+import org.fisco.bcos.sdk.v3.model.TransactionReceipt;
+import org.fu.blockchain_backend.contracts.DegreeStorage;
+import org.fu.blockchain_backend.model.Degree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+@Service
+public class BlockchainService {
+    private static final Logger logger = LoggerFactory.getLogger(BlockchainService.class);
+
+    // 获取配置文件地址 - 确保这个路径是正确的，并且配置文件是 v3.x 兼容的
+    public static final String configFile = "src/main/resources/config-example.toml";
+    // 合约地址 - 从 WeBASE 或部署时获取
+    public static final String contractAddress = "0x37a44585bf1e9618fdb4c62c4c96189a07dd4b48";
+    // 群组ID - 配置文件 config-example.toml 中
+    // PEM 文件路径 - 确保这个路径是正确的，并且 PEM 文件存在
+    public static final String pemFilePath = "src/main/resources/key/Admin_key_0xc0e52bdce1f04d0a3d6e5632d37ee89db57bead7.pem";
+
+    // --- SDK 和 Client 对象 ---
+    // 可以将 SDK 和 Client 初始化为静态变量，并在 @BeforeAll 中设置，避免每个测试方法都初始化
+    private static BcosSDK sdk;
+    private static Client client;
+    private static CryptoKeyPair keyPair;
+    private static DegreeStorage degreeStorage; // 合约对象也可以预先加载
+
+    public void init() {
+        logger.info("Setting up test environment...");
+        sdk = BcosSDK.build(configFile);
+        client = sdk.getClient();
+
+        // 加载账户
+        CryptoSuite cryptoSuite = client.getCryptoSuite();
+        cryptoSuite.loadAccount("pem", pemFilePath, null); // 假设无密码
+        keyPair = cryptoSuite.getCryptoKeyPair();
+
+        if (keyPair == null) {
+            String errorMsg = "Failed to load account from PEM file: " + pemFilePath;
+            logger.error(errorMsg);
+            throw new RuntimeException(errorMsg);
+        }
+        logger.info("Account loaded successfully. Address: {}", keyPair.getAddress());
+
+        // 加载合约对象
+        degreeStorage = DegreeStorage.load(contractAddress, client, keyPair);
+        logger.info("DegreeStorage contract loaded at address: {}", contractAddress);
+        logger.info("Setup complete.");
+    }
+
+    public String uploadDegreeToBlockchain(Degree degree, String timestamp) {
+        init();
+        //long currentMillis = System.currentTimeMillis();
+        //String timestamp = String.valueOf(currentMillis);
+        try{
+            TransactionReceipt receipt = degreeStorage.addDegree(
+                    degree.getName(), degree.getIdCardNum(), degree.getUniversity(), degree.getMajor(), degree.getDegreeLevel(),  degree.getGraduationDate().toString(), timestamp
+            );
+            return receipt.getTransactionHash();
+        } catch (Exception e){
+            logger.error("Error sending addAndSaveDegree transaction: ", e);
+            throw new RuntimeException(e.toString());
+        }
+    }
+
+    public Degree getDegreeByIdCard(String idCardNum) {
+        init();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            List<DegreeStorage.Degree> degrees = degreeStorage.getDegrees(idCardNum);
+            if(degrees == null || degrees.isEmpty()){
+                logger.warn("区块链上未查询到身份证号 {} 的学历记录", idCardNum);
+                return null; // 或者抛出自定义异常
+            };
+            DegreeStorage.Degree ContractDegree = degrees.get(0);
+            Degree degree = new Degree();
+            degree.setName(ContractDegree.getName());
+            degree.setIdCardNum(ContractDegree.getIdCardNum());
+            degree.setUniversity(ContractDegree.getUniversity());
+            degree.setMajor(ContractDegree.getMajor());
+            degree.setDegreeLevel(ContractDegree.getDegreeLevel());
+            degree.setGraduationDate(LocalDate.parse(ContractDegree.getGraduationDate(), formatter));
+            return degree;
+        } catch (Exception e) {
+            logger.error("Error getting degree by id card: ", e);
+            throw new RuntimeException(e.toString());
+        }
+    }
+}
