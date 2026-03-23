@@ -1,8 +1,11 @@
 package org.fu.blockchain_backend.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import cn.hutool.crypto.SecureUtil;
+import org.fisco.bcos.sdk.v3.client.Client;
+import org.fisco.bcos.sdk.v3.crypto.keypair.CryptoKeyPair;
+import org.fu.blockchain_backend.dto.RegisterReqDTO;
 import org.fu.blockchain_backend.entity.SysUser;
-import org.fu.blockchain_backend.mapper.SysUserMapper;
+import org.fu.blockchain_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,23 +14,36 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl {
 
     @Autowired
-    private SysUserMapper sysUserMapper;
+    private UserRepository userRepository;
+
+    @Autowired
+    private Client client; // 注入 FISCO BCOS 官方底层客户端
 
     @Transactional(rollbackFor = Exception.class)
-    public void register(SysUser user) {
+    public void register(RegisterReqDTO dto) {
         // 1. 检查用户名是否重复
-        if (sysUserMapper.selectCount(new QueryWrapper<SysUser>().eq("username", user.getUsername())) > 0) {
+        if (userRepository.findByUsername(dto.getUsername()) != null) {
             throw new RuntimeException("用户名已存在");
         }
 
-        // 2. 调用 WeBASE 生成区块链身份 (使用 username 作为 signUserId)
-        String chainAddress = WeBASEUtil.createAccount(user.getUsername());
+        // 2. 【核心修复】使用 v3.x 语法在本地生成区块链公私钥对
+        // 注意：这里调用的是 getKeyPairFactory().generateKeyPair()
+        CryptoKeyPair keyPair = client.getCryptoSuite().getKeyPairFactory().generateKeyPair();
+        String chainAddress = keyPair.getAddress();
+        String privateKey = keyPair.getHexPrivateKey();
+
+        // 3. 组装实体并保存
+        SysUser user = new SysUser();
+        user.setUsername(dto.getUsername());
+
+        // 使用 Hutool 进行 MD5 加密（你在 pom.xml 中已经引入了 hutool）
+        user.setPassword(SecureUtil.md5(dto.getPassword()));
+
+        user.setCompanyName(dto.getCompanyName());
+        user.setRole("CORP");
         user.setChainAddress(chainAddress);
+        user.setPrivateKey(privateKey); // 存入私钥，后续发交易要用来签名
 
-        // 3. 保存到 MySQL
-        user.setRole("CORP"); // 默认注册为企业
-        sysUserMapper.insert(user);
+        userRepository.save(user);
     }
-
-    // login 方法略 (查库比对密码即可)
 }

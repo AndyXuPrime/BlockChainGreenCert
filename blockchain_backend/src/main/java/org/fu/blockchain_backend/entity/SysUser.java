@@ -14,5 +14,5 @@ public class SysUser {
     private String role;
     private String companyName;
     private String chainAddress;
-    private String privateKey; // 路线B必须存私钥用于签名
+    private String privateKey;
 }
