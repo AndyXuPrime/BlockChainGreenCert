@@ -1,21 +1,20 @@
-<script setup>
-
-</script>
-
 <template>
   <div id="app">
-    <router-view></router-view>
+    <router-view/>
   </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-
-export default defineComponent({
-  name: 'App',
-});
+export default {
+  name: 'App'
+}
 </script>
 
 <style>
-
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 20px;
+}
 </style>
