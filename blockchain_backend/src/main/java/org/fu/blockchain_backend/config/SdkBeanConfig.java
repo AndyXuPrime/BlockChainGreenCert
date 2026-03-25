@@ -28,14 +28,19 @@ public class SdkBeanConfig {
         configNetwork(property);
         configCryptoMaterial(property);
 
+        // 1. 初始化配置选项
         ConfigOption configOption = new ConfigOption(property);
+
+        // 2. 根据 group0 创建底层连接客户端
         Client client = new BcosSDK(configOption).getClient(systemConfig.getGroupId());
 
+        // 3. 测试连接是否成功（获取当前区块高度）
         BigInteger blockNumber = client.getBlockNumber().getBlockNumber();
-        log.info("Chain connect successful. Current block number {}", blockNumber);
+        log.info("🎉 区块链底层节点连接成功！当前区块高度: {}", blockNumber);
 
-        configCryptoKeyPair(client);
-        log.info("is Gm:{}, address:{}", client.getCryptoSuite().cryptoTypeConfig == 1, client.getCryptoSuite().getCryptoKeyPair().getAddress());
+        // 【核心修复】彻底删除了 configCryptoKeyPair(client) 的调用
+        // 全局 Client 不再绑定任何私钥，私钥将在 Service 业务层动态加载
+
         return client;
     }
 
@@ -47,24 +52,5 @@ public class SdkBeanConfig {
     public void configCryptoMaterial(ConfigProperty configProperty){
         Map<String, Object> cryptoMaterials = bcosConfig.getCryptoMaterial();
         configProperty.setCryptoMaterial(cryptoMaterials);
-    }
-
-    public void configCryptoKeyPair(Client client) {
-        if(systemConfig.getHexPrivateKey() == null || systemConfig.getHexPrivateKey().isEmpty()){
-            return;
-        }
-        // 此处适配webase的多个hexPrivateKey，选中其中一个
-        String privateKey;
-        if (!systemConfig.getHexPrivateKey().contains(",")) {
-            privateKey = systemConfig.getHexPrivateKey();
-        } else {
-            String[] list = systemConfig.getHexPrivateKey().split(",");
-            privateKey = list[0];
-        }
-        if (privateKey.startsWith("0x") || privateKey.startsWith("0X")) {
-            privateKey = privateKey.substring(2);
-            systemConfig.setHexPrivateKey(privateKey);
-        }
-        client.getCryptoSuite().setCryptoKeyPair(client.getCryptoSuite().loadKeyPair(systemConfig.getHexPrivateKey()));
     }
 }

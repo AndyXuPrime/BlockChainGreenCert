@@ -1,8 +1,4 @@
 # FISCO BCOS v3.x Java SDK Configuration Template (config-example.toml)
-
-# =============================================================
-#                   加密和证书配置 (Crypto Material)
-# =============================================================
 [cryptoMaterial]
 # 是否使用国密加密 (SM Crypto)
 # true: 使用国密 (SM2/SM3/SM4)
@@ -24,9 +20,6 @@ sdkPrivateKeyPath = "conf/sdk.key"     # SDK 私钥
 # smEnSdkCertPath = "conf/sm_ensdk.crt"
 # smEnSdkPrivateKeyPath = "conf/sm_ensdk.key"
 
-# =============================================================
-#                         网络配置 (Network)
-# =============================================================
 [network]
 # 配置 SDK 可以连接的节点列表 (IP:Port 格式)
 # SDK 会尝试连接这些节点以获取指定群组的信息和进行交互
@@ -38,10 +31,6 @@ messageTimeout = "10000"
 
 # 是否启用 JNI Channel (通常保持 false，除非有特殊性能需求且环境支持)
 # useJni = false
-
-# =============================================================
-#                         链配置 (Chain)
-# =============================================================
 [chain]
 # 链 ID (必须与您连接的 FISCO BCOS 链的 ChainID 一致)
 #chainId = "0"  # !!! 修改为您的链 ID !!!
