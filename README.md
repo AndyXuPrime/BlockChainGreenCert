@@ -25,17 +25,17 @@
 ```mermaid
 graph TB
     subgraph "前端层 (Web2 体验)"
-        A[Vue 3 前端界面<br/>发起核发/流转/核验请求]
+        A["Vue 3 前端界面<br/>发起核发/流转/核验请求"]
     end
 
     subgraph "业务调度层 (桥梁)"
-        B[Spring Boot 后端<br/>业务逻辑与权限校验]
-        C((动态提取私钥<br/>构建交易并签名))
+        B["Spring Boot 后端<br/>业务逻辑与权限校验"]
+        C(("动态提取私钥<br/>构建交易并签名"))
     end
 
     subgraph "持久化与共识层 (双引擎)"
-        D[(MySQL 数据库)<br/>存储: 账号密码、企业明细<br/>绿证列表、流转日志]
-        E[(FISCO BCOS 联盟链)<br/>存储: 资产归属权、电量<br/>状态(isValid)、交易哈希]
+        D[("MySQL 数据库<br/>存储: 账号密码、企业明细<br/>绿证列表、流转日志")]
+        E[("FISCO BCOS 联盟链<br/>存储: 资产归属权、电量<br/>状态(isValid)、交易哈希")]
     end
 
     A <-->|HTTP/JSON| B
