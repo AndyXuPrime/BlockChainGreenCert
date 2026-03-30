@@ -9,14 +9,17 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@CrossOrigin // 允许 Vue 前端跨域调用
+@CrossOrigin
 @RestController
 @RequestMapping("/api/cert")
 public class GreenCertController {
 
     @Autowired
     private GreenCertBusinessService certService;
-
+    @Autowired
+    private org.fu.blockchain_backend.repository.GreenCertRepository greenCertRepository;
+    @Autowired
+    private org.fu.blockchain_backend.repository.CertTransferLogRepository transferLogRepository;
     /**
      * 1. 核发接口 (你已经调通了这个)
      */
@@ -71,5 +74,24 @@ public class GreenCertController {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    // 1. 管理员：查询所有绿证
+    @GetMapping("/listAll")
+    public Result listAll() {
+        return Result.success(greenCertRepository.findAll());
+    }
+
+    // 2. 管理员：查询所有流转日志
+    @GetMapping("/logs")
+    public Result listLogs() {
+        return Result.success(transferLogRepository.findAll());
+    }
+
+    // 3. 企业：查询我拥有的绿证
+    @GetMapping("/myCerts/{ownerId}")
+    public Result myCerts(@PathVariable Integer ownerId) {
+        // 需要在 GreenCertRepository 里加一句: List<GreenCertEntity> findByCurrentOwnerId(Integer currentOwnerId);
+        return Result.success(greenCertRepository.findByCurrentOwnerId(ownerId));
     }
 }
