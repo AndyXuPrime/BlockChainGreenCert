@@ -6,7 +6,7 @@
 [![FISCO BCOS](https://img.shields.io/badge/FISCO_BCOS-3.x-108EE9.svg)](https://fisco-bcos-doc.readthedocs.io/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue.svg)](https://www.mysql.com/)
 
-> 一个面向“双碳”目标的现代化绿色电力证书（绿证）管理平台。本项目采用**“链上链下协同（双引擎）”**架构设计，结合 Spring Boot 与 FISCO BCOS 联盟链，实现了绿证的权威核发、跨域流转、数据溯源与防篡改交叉核验。
+> 一个面向“双碳”目标的现代化绿色电力证书（绿证）管理平台。本项目采用 **“链上链下协同（双引擎）”** 架构设计，结合 Spring Boot 与 FISCO BCOS 联盟链，实现了绿证的权威核发、跨域流转、数据溯源与防篡改交叉核验。
 >
 > 💡 **特别说明**：本项目附带详尽的《新手避坑指南》，非常适合作为高校学生、初学者入门 Web3 全栈开发的学习参考项目。
 
@@ -138,13 +138,13 @@ npm run dev
 2. **`green_cert` (绿证主表):** 映射智能合约结构体，包含 `status` (0-未上链, 1-有效, 2-已作废) 和 `tx_hash` (上链凭据)。
 3. **`cert_transfer_log` (流转溯源表):** 记录证书的每一次流转历史（A -> B -> C），为前端提供毫秒级的溯源时间轴查询。
 
-## 💣 附录：新手避坑指南 (Blood & Tears)
+## 💣 附录：新手避坑指南 
 
 刚接触区块链开发？不要被底层报错吓倒。以下是本项目开发过程中总结的“排雷手册”：
 
 ### 坑 1：区块链到底能不能改数据？
 *   **误区：** 以为智能合约里能写 `DELETE` 语句物理删除发错的绿证。
-*   **正解：** 引入**“逻辑删除（Logical Deletion）”**设计模式。在合约中增加 `bool isValid` 字段，作废时将其置为 `false`，并在流转时拦截无效证书。区块链的本质是“状态追加”，一切错误纠正都会留下不可篡改的审计轨迹。
+*   **正解：** 引入 **“逻辑删除（Logical Deletion）”** 设计模式。在合约中增加 `bool isValid` 字段，作废时将其置为 `false`，并在流转时拦截无效证书。区块链的本质是“状态追加”，一切错误纠正都会留下不可篡改的审计轨迹。
 
 ### 坑 2：Java 启动报 `NumberFormatException: For input string: "M" under radix 16`
 *   **病因：** 底层 Java SDK 加载私钥时崩溃。
