@@ -1,0 +1,85 @@
+# ==========================================
+# 1. 前端 (Node.js / Vue / Vite)
+# ==========================================
+# 依赖包 (绝对不能提交)
+node_modules/
+# Vite 生产环境打包构建的产物
+/blockchain_front/dist/
+/blockchain_front/dist-ssr/
+# npm/yarn/pnpm 产生的错误日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+# 本地环境变量 (防止泄露敏感配置)
+.env.local
+.env.*.local
+
+# ==========================================
+# 2. 后端 (Java / Spring Boot / Maven)
+# ==========================================
+# Maven 编译产物
+blockchain_backend/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+# 忽略打包生成的 jar/war
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+# JVM 崩溃日志
+hs_err_pid*
+
+# ==========================================
+# 3. IDE 及编辑器配置文件 (避免团队成员配置冲突)
+# ==========================================
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+# VS Code
+.vscode/
+*.code-workspace
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ==========================================
+# 4. 操作系统产生的垃圾文件
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ==========================================
+# 5. 项目运行时的日志文件
+# ==========================================
+*.log
+logs/
